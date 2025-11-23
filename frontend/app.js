@@ -1,5 +1,8 @@
 window.addEventListener("DOMContentLoaded", async () => {
-    const contractAddress = "0x12503c00800C9011Af0e90D05438FeEA4F129748";
+    // ЗАМЕНИТЕ НА ВАШ АДРЕС КОНТРАКТА ПОСЛЕ ДЕПЛОЯ
+    const contractAddress = "0xВашАдресКонтракта";
+    
+    // ABI контракта (получите после компиляции)
     const abi = [
         "function projectName() view returns (string)",
         "function description() view returns (string)",

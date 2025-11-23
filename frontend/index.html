@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -69,4 +70,72 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.0/ethers.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Помощь бездомным животным</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Помощь бездомным животным</h1>
+        <p class="subtitle">Ваше пожертвование спасет жизни!</p>
+
+        <div class="project-info">
+            <h2 id="projectName">Загрузка...</h2>
+            <p id="description" class="description"></p>
+            
+            <div class="stats">
+                <div class="stat">
+                    <span class="label">Цель:</span>
+                    <span id="goal" class="value">0 ETH</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Собрано:</span>
+                    <span id="totalFunds" class="value">0 ETH</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Прогресс:</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div id="progress" class="progress-fill"></div>
+            </div>
+
+            <div class="stat">
+                <span class="label">Организатор:</span>
+                <span id="owner" class="value"></span>
+            </div>
+        </div>
+
+        <button id="connectBtn" class="btn primary">🔗 Подключить MetaMask</button>
+
+        <div class="action-section">
+            <h3>💝 Сделать пожертвование</h3>
+            <div class="input-group">
+                <input id="amount" type="number" step="0.001" placeholder="Количество ETH">
+                <button id="fundBtn" class="btn success">Пожертвовать</button>
+            </div>
+        </div>
+
+        <div class="action-section">
+            <h3>⚙️ Действия</h3>
+            <button id="withdrawBtn" class="btn warning">Вывести средства (только организатор)</button>
+            <button id="refundBtn" class="btn danger">Вернуть средства (если цель не достигнута)</button>
+        </div>
+
+        <div class="donations-section">
+            <h3>📋 История пожертвований</h3>
+            <ul id="donationsList"></ul>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.11.0/ethers.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+>>>>>>> 4dc3015a5fdbb12c077bd7859b3dce67599a0401
 </html>

@@ -1,8 +1,6 @@
 window.addEventListener("DOMContentLoaded", async () => {
-    // ЗАМЕНИТЕ НА ВАШ АДРЕС КОНТРАКТА ПОСЛЕ ДЕПЛОЯ
-    const contractAddress = "0xВашАдресКонтракта";
+    const contractAddress = "0x12503c00800C9011Af0e90D05438FeEA4F129748";
     
-    // ABI контракта (получите после компиляции)
     const abi = [
         "function projectName() view returns (string)",
         "function description() view returns (string)",
@@ -123,17 +121,40 @@ window.addEventListener("DOMContentLoaded", async () => {
         try {
             const tx = await contract.fund({ value: ethers.parseEther(ethAmount) });
             fundBtn.textContent = "⏳ Отправка...";
+            fundBtn.disabled = true;
+            
             await tx.wait();
+            
+            // ПОКАЗЫВАЕМ ГИФКУ КОТИКА 🐱
+            showCatAnimation();
+            
             fundBtn.textContent = "Пожертвовать";
+            fundBtn.disabled = false;
             amountInput.value = "";
             await loadContractData();
-            alert("✅ Спасибо за ваше пожертвование!");
+            
         } catch (err) {
             console.error(err);
             alert("Ошибка пожертвования: " + err.message);
             fundBtn.textContent = "Пожертвовать";
+            fundBtn.disabled = false;
         }
     };
+
+    // Функция показа анимации котика
+    function showCatAnimation() {
+        const catAnimation = document.getElementById('catAnimation');
+        
+        // Показываем блок с гифкой
+        catAnimation.classList.remove("hidden");
+        catAnimation.classList.add("show");
+        
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            catAnimation.classList.remove("show");
+            catAnimation.classList.add("hidden");
+        }, 5000);
+    }
 
     // Вывод средств
     withdrawBtn.onclick = async () => {

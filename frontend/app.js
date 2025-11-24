@@ -89,25 +89,47 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Загрузка истории донатов
-    async function loadDonations() {
-        donationsList.innerHTML = "";
+// Загрузка истории донатов
+async function loadDonations() {
+    donationsList.innerHTML = "";
+    
+    try {
+        const donorCount = await contract.donorCount();
+        let hasDonations = false;
         
-        try {
-            const donorCount = await contract.donorCount();
+        for (let i = 0; i < donorCount; i++) {
+            const donation = await contract.donors(i);
+            const amount = Number(donation.amount);
             
-            for (let i = 0; i < donorCount; i++) {
-                const donation = await contract.donors(i);
-                if (Number(donation.amount) > 0) {
-                    const li = document.createElement("li");
-                    const date = new Date(Number(donation.timestamp) * 1000).toLocaleDateString();
-                    li.textContent = `${donation.donor.slice(0, 6)}...${donation.donor.slice(-4)}: ${ethers.formatEther(donation.amount)} ETH (${date})`;
-                    donationsList.appendChild(li);
-                }
+            // Показываем только донаты с amount > 0
+            if (amount > 0) {
+                hasDonations = true;
+                const li = document.createElement("li");
+                const date = new Date(Number(donation.timestamp) * 1000).toLocaleDateString('ru-RU');
+                const formattedAmount = ethers.formatEther(donation.amount);
+                
+                li.textContent = `${donation.donor.slice(0, 6)}...${donation.donor.slice(-4)}: ${formattedAmount} ETH (${date})`;
+                donationsList.appendChild(li);
             }
-        } catch (err) {
-            console.error("Ошибка загрузки донатов:", err);
         }
+        
+        // Если донатов нет, показываем сообщение
+        if (!hasDonations) {
+            const li = document.createElement("li");
+            li.textContent = "Пока нет пожертвований";
+            li.style.color = "#666";
+            li.style.fontStyle = "italic";
+            donationsList.appendChild(li);
+        }
+        
+    } catch (err) {
+        console.error("Ошибка загрузки донатов:", err);
+        const li = document.createElement("li");
+        li.textContent = "Ошибка загрузки истории";
+        li.style.color = "red";
+        donationsList.appendChild(li);
     }
+}
 
     // Пожертвование
     fundBtn.onclick = async () => {

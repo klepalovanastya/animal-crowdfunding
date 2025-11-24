@@ -94,49 +94,21 @@ window.addEventListener("DOMContentLoaded", async () => {
         
         try {
             const donorCount = await contract.donorCount();
-            console.log("Всего донатов в контракте:", donorCount.toString());
-            
-            let hasDonations = false;
             
             for (let i = 0; i < donorCount; i++) {
                 const donation = await contract.donors(i);
-                console.log(`Донат ${i}:`, donation);
-                
-                const donor = donation[0]; 
-                const amount = donation[1];       
-                const timestamp = donation[2];  
-                
-                const amountNumber = Number(amount);
-                
-                // Показываем только донаты с amount > 0
-                if (amountNumber > 0) {
-                    hasDonations = true;
+                if (Number(donation.amount) > 0) {
                     const li = document.createElement("li");
-                    const date = new Date(Number(timestamp) * 1000).toLocaleDateString('ru-RU');
-                    const formattedAmount = ethers.formatEther(amount);
-                    
-                    li.textContent = `${donor.slice(0, 6)}...${donor.slice(-4)}: ${formattedAmount} ETH (${date})`;
+                    const date = new Date(Number(donation.timestamp) * 1000).toLocaleDateString();
+                    li.textContent = `${donation.donor.slice(0, 6)}...${donation.donor.slice(-4)}: ${ethers.formatEther(donation.amount)} ETH (${date})`;
                     donationsList.appendChild(li);
                 }
             }
-            
-            // Если донатов нет, показываем сообщение
-            if (!hasDonations) {
-                const li = document.createElement("li");
-                li.textContent = "Пока нет пожертвований";
-                li.style.color = "#666";
-                li.style.fontStyle = "italic";
-                donationsList.appendChild(li);
-            }
-            
         } catch (err) {
             console.error("Ошибка загрузки донатов:", err);
-            const li = document.createElement("li");
-            li.textContent = "Ошибка загрузки истории: " + err.message;
-            li.style.color = "red";
-            donationsList.appendChild(li);
         }
     }
+    
     // Пожертвование
     fundBtn.onclick = async () => {
         if (!contract) return alert("Сначала подключите MetaMask!");

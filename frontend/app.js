@@ -27,22 +27,27 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     let provider, signer, contract;
 
+    // Подключение MetaMask
     connectBtn.onclick = async () => {
-        if (!window.ethereum) { 
-            alert("Установите MetaMask!"); 
-            return; 
+        if (!window.ethereum) {
+            alert("Пожалуйста, установите MetaMask!");
+            return;
         }
+        
         try {
             provider = new ethers.BrowserProvider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             signer = await provider.getSigner();
             contract = new ethers.Contract(contractAddress, abi, signer);
+            
             const account = await signer.getAddress();
-            connectBtn.innerText = "Подключено: " + account.slice(0,6) + "...";
+            connectBtn.innerText = "✅ Подключено: " + account.slice(0, 6) + "..." + account.slice(-4);
+            connectBtn.classList.add("connected");
+            
             loadContractData();
-        } catch (err) { 
-            console.error(err); 
-            alert("Ошибка подключения: " + err.message); 
+        } catch (err) {
+            console.error(err);
+            alert("Ошибка подключения: " + err.message);
         }
     };
 
@@ -76,7 +81,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-   // Пожертвование
+    // Пожертвование
     fundBtn.onclick = async () => {
         if (!contract) return alert("Сначала подключите MetaMask!");
         
@@ -123,14 +128,26 @@ window.addEventListener("DOMContentLoaded", async () => {
         }, 5000);
     }
 
-    withdrawBtn.onclick = async () => { 
-        if (!contract) return alert("Сначала подключите MetaMask!"); 
-        try { 
-            await (await contract.withdraw()).wait(); 
-            loadContractData(); 
+    // Вывод средств
+    withdrawBtn.onclick = async () => {
+        if (!contract) return alert("Сначала подключите MetaMask!");
+        
+        try {
+            const tx = await contract.withdraw();
+            withdrawBtn.textContent = "⏳ Вывод...";
+            await tx.wait();
+            withdrawBtn.textContent = "Вывести средства";
+            await loadContractData();
+            alert("✅ Средства успешно выведены!");
         } catch (err) {
-            console.error(err); 
-            alert("Ошибка вывода: " + err.message); 
-        } 
+            console.error(err);
+            alert("Ошибка вывода: " + err.message);
+            withdrawBtn.textContent = "Вывести средства";
+        }
     };
+
+    // Автоподключение если уже подключены к MetaMask
+    if (window.ethereum) {
+        connectBtn.click();
+    }
 });

@@ -27,7 +27,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     let provider, signer, contract;
 
-    // Подключение MetaMask
     connectBtn.onclick = async () => {
         if (!window.ethereum) {
             alert("Пожалуйста, установите MetaMask!");
@@ -53,35 +52,43 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     async function loadContractData() {
         if (!contract) return;
-        const name = await contract.projectName();
-        const desc = await contract.description();
-        const goal = await contract.goal();
-        const total = await contract.totalFunds();
-        const owner = await contract.owner();
-        const progress = await contract.getProgress();
+        try {
+            const name = await contract.projectName();
+            const desc = await contract.description();
+            const goal = await contract.goal();
+            const total = await contract.totalFunds();
+            const owner = await contract.owner();
+            const progress = await contract.getProgress();
 
-        projectNameEl.textContent = name;
-        descriptionEl.textContent = desc;
-        goalEl.textContent = ethers.formatEther(goal) + " ETH";
-        totalFundsEl.textContent = ethers.formatEther(total) + " ETH";
-        ownerEl.textContent = owner;
+            projectNameEl.textContent = name;
+            descriptionEl.textContent = desc;
+            goalEl.textContent = ethers.formatEther(goal) + " ETH";
+            totalFundsEl.textContent = ethers.formatEther(total) + " ETH";
+            ownerEl.textContent = owner;
 
-        const progressPercent = Math.min(100, progress);
-        progressFill.style.width = progressPercent + "%";
+            const progressValue = Number(progress.toString());
+            const progressPercent = Math.min(100, progressValue);
+            progressFill.style.width = progressPercent + "%";
 
-        donationsList.innerHTML = "";
-        const donorCount = await contract.donorCount();
-        for (let i = 0; i < donorCount; i++) {
-            const d = await contract.donors(i);
-            if (Number(d.amount) > 0) {
-                const li = document.createElement("li");
-                li.textContent = `${d.donor}: ${ethers.formatEther(d.amount)} ETH`;
-                donationsList.appendChild(li);
+            donationsList.innerHTML = "";
+            const donorCount = await contract.donorCount();
+            const count = Number(donorCount.toString());
+            
+            for (let i = 0; i < count; i++) {
+                const d = await contract.donors(i);
+                const amountValue = Number(d.amount.toString());
+                
+                if (amountValue > 0) {
+                    const li = document.createElement("li");
+                    li.textContent = `${d.donor}: ${ethers.formatEther(d.amount)} ETH`;
+                    donationsList.appendChild(li);
+                }
             }
+        } catch (err) {
+            console.error("Ошибка загрузки данных:", err);
         }
     }
 
-    // Пожертвование
     fundBtn.onclick = async () => {
         if (!contract) return alert("Сначала подключите MetaMask!");
         
@@ -97,7 +104,6 @@ window.addEventListener("DOMContentLoaded", async () => {
             
             await tx.wait();
             
-            // Показываем анимацию котика
             showCatAnimation();
             
             fundBtn.textContent = "Пожертвовать";
@@ -113,22 +119,16 @@ window.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Функция показа анимации котика
     function showCatAnimation() {
         const catAnimation = document.getElementById('catAnimation');
-        
-        // Показываем блок с гифкой
         catAnimation.classList.remove("hidden");
         catAnimation.classList.add("show");
-        
-        // Автоматически скрываем через 5 секунд
         setTimeout(() => {
             catAnimation.classList.remove("show");
             catAnimation.classList.add("hidden");
         }, 5000);
     }
 
-    // Вывод средств
     withdrawBtn.onclick = async () => {
         if (!contract) return alert("Сначала подключите MetaMask!");
         
@@ -146,7 +146,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Автоподключение если уже подключены к MetaMask
     if (window.ethereum) {
         connectBtn.click();
     }

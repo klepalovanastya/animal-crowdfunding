@@ -11,14 +11,12 @@ contract CrowdfundingAnimals {
     struct Donation {
         address donor;
         uint amount;
-        uint timestamp;
     }
     
     Donation[] public donations;
     
     event Funded(address indexed donor, uint amount);
     event Withdrawn(address indexed owner, uint amount);
-    event Refunded(address indexed donor, uint amount);
 
     constructor(string memory _name, string memory _description, uint _goal) {
         projectName = _name;
@@ -31,7 +29,7 @@ contract CrowdfundingAnimals {
     function fund() public payable {
         require(msg.value > 0, "Donate more than 0");
         totalFunds += msg.value;
-        donations.push(Donation(msg.sender, msg.value, block.timestamp));
+        donations.push(Donation(msg.sender, msg.value));
         emit Funded(msg.sender, msg.value);
     }
 
@@ -45,30 +43,13 @@ contract CrowdfundingAnimals {
         emit Withdrawn(owner, amount);
     }
 
-    function refund() public {
-        require(totalFunds < goal, "Goal reached, cannot refund");
-        
-        uint refundAmount = 0;
-        for (uint i = 0; i < donations.length; i++) {
-            if (donations[i].donor == msg.sender && donations[i].amount > 0) {
-                refundAmount += donations[i].amount;
-                donations[i].amount = 0;
-            }
-        }
-        
-        require(refundAmount > 0, "No funds to refund");
-        payable(msg.sender).transfer(refundAmount);
-        totalFunds -= refundAmount;
-        emit Refunded(msg.sender, refundAmount);
-    }
-
     function donorCount() public view returns (uint) {
         return donations.length;
     }
 
-    function donors(uint index) public view returns (address donor, uint amount, uint timestamp) {
+    function donors(uint index) public view returns (address donor, uint amount) {
         Donation storage d = donations[index];
-        return (d.donor, d.amount, d.timestamp);
+        return (d.donor, d.amount);
     }
 
     function getProgress() public view returns (uint) {

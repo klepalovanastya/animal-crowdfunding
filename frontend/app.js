@@ -76,19 +76,52 @@ window.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+   // Пожертвование
     fundBtn.onclick = async () => {
         if (!contract) return alert("Сначала подключите MetaMask!");
+        
         const ethAmount = amountInput.value;
-        if (!ethAmount || Number(ethAmount) <= 0) return alert("Введите корректное количество ETH");
-        try { 
-            await (await contract.fund({ value: ethers.parseEther(ethAmount) })).wait();
-            loadContractData(); 
+        if (!ethAmount || Number(ethAmount) <= 0) {
+            return alert("Введите корректное количество ETH");
         }
-        catch (err) { 
-            console.error(err); 
-            alert("Ошибка пожертвования: " + err.message); 
+        
+        try {
+            const tx = await contract.fund({ value: ethers.parseEther(ethAmount) });
+            fundBtn.textContent = "⏳ Отправка...";
+            fundBtn.disabled = true;
+            
+            await tx.wait();
+            
+            // Показываем анимацию котика
+            showCatAnimation();
+            
+            fundBtn.textContent = "Пожертвовать";
+            fundBtn.disabled = false;
+            amountInput.value = "";
+            await loadContractData();
+            
+        } catch (err) {
+            console.error(err);
+            alert("Ошибка пожертвования: " + err.message);
+            fundBtn.textContent = "Пожертвовать";
+            fundBtn.disabled = false;
         }
     };
+
+    // Функция показа анимации котика
+    function showCatAnimation() {
+        const catAnimation = document.getElementById('catAnimation');
+        
+        // Показываем блок с гифкой
+        catAnimation.classList.remove("hidden");
+        catAnimation.classList.add("show");
+        
+        // Автоматически скрываем через 5 секунд
+        setTimeout(() => {
+            catAnimation.classList.remove("show");
+            catAnimation.classList.add("hidden");
+        }, 5000);
+    }
 
     withdrawBtn.onclick = async () => { 
         if (!contract) return alert("Сначала подключите MetaMask!"); 
